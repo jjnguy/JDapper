@@ -1,8 +1,7 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
 	public static void main(String[] args) throws Exception {
@@ -15,9 +14,12 @@ public class Main {
 		Connection conn = DriverManager.getConnection(url + dbName, userName, password);
 		JDapper jd = new JDapper(conn);
 
-		String sql = "SELECT * FROM Country LIMIT 20";
+		Scanner sin = new Scanner(System.in);
+		String pop = sin.nextLine();
+		
+		String sql = "SELECT * FROM Country WHERE Population < ? LIMIT 20";
 
-		List<Country> results = jd.query(sql, Country.class);
+		List<Country> results = jd.query(sql, Country.class, pop);
 		for (Country country : results) {
 			System.out.println(country.name);
 		}
