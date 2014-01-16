@@ -16,6 +16,7 @@ public class JDapper {
 		
 		Field[] fields = type.getFields();
 		ResultSet rs = conn.createStatement().executeQuery(sql);
+		
 		while(rs.next()){
 			T obj = type.getConstructor().newInstance();
 			
