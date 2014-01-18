@@ -15,6 +15,7 @@ public class Main {
 		JDapper jd = new JDapper(conn);
 
 		Scanner sin = new Scanner(System.in);
+		System.out.println("Please enter in a population: ");
 		String pop = sin.nextLine();
 		
 		String sql = "SELECT * FROM Country WHERE Population < ? LIMIT 20";
