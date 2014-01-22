@@ -1,6 +1,9 @@
 
 public class Country {
-	public String code;
-	public String name;
-	public double surfaceArea;
+	private String code;
+	private String name;
+	private double surfaceArea;
+	public String getName() {
+		return name;
+	}
 }

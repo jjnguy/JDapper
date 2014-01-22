@@ -22,7 +22,7 @@ public class Main {
 
 		List<Country> results = jd.query(sql, Country.class, pop);
 		for (Country country : results) {
-			System.out.println(country.name);
+			System.out.println(country.getName());
 		}
 
 		conn.close();

@@ -15,7 +15,10 @@ public class JDapper {
 	public <T> List<T> query(String sql, Class<T> type, Object...params) throws Exception {
 		List<T> results = new ArrayList<>();
 		
-		Field[] fields = type.getFields();
+		Field[] fields = type.getDeclaredFields();
+		for (Field field : fields) {
+			field.setAccessible(true);
+		}
 		
 		PreparedStatement statement = conn.prepareStatement(sql);
 		
@@ -38,4 +41,6 @@ public class JDapper {
 		
 		return results;
 	}
+	
+	
 }
