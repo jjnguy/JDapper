@@ -2,6 +2,7 @@ import java.lang.reflect.Field;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,5 +43,28 @@ public class JDapper {
 		return results;
 	}
 	
-	
+	private static final String RAW_INSERT = "INSERT INTO %s (%s) VALUES (%s);";
+	public void insert(String tableName, Object data) throws Exception{
+		Class<?> type = data.getClass();
+		Field[] fields = type.getFields();
+		
+		String columnNames = "";
+		String values = "";
+		for (Field field : fields) {
+			columnNames += "," + field.getName();
+			values += ",?";
+		}
+		columnNames = columnNames.substring(1);
+		values = values.substring(1);
+		
+		String sql = String.format(RAW_INSERT, tableName, columnNames, values);
+		
+		PreparedStatement statement = conn.prepareStatement(sql);
+		
+		for (int i = 0; i < fields.length; i++) {
+			statement.setObject(i+1, fields[i].get(data));
+		}
+		
+		statement.execute();
+	}
 }

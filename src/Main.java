@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Main {
 	public static void main(String[] args) throws Exception {
 		String url = "jdbc:mysql://localhost:3307/";
-		String dbName = "world";
+		String dbName = "test"; //"world";
 		String driver = "com.mysql.jdbc.Driver";
 		String userName = "jjnguy";
 		String password = "asdf1234";
@@ -14,17 +14,10 @@ public class Main {
 		Connection conn = DriverManager.getConnection(url + dbName, userName, password);
 		JDapper jd = new JDapper(conn);
 
-		Scanner sin = new Scanner(System.in);
-		System.out.println("Please enter in a population: ");
-		String pop = sin.nextLine();
+		Stuff s = new Stuff();
+		s.string1 = "Hi youtube";
+		s.number1 = 42;
 		
-		String sql = "SELECT * FROM Country WHERE Population < ? LIMIT 20";
-
-		List<Country> results = jd.query(sql, Country.class, pop);
-		for (Country country : results) {
-			System.out.println(country.getName());
-		}
-
-		conn.close();
+		jd.insert("stuff", s);
 	}
 }
