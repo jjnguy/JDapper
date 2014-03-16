@@ -15,7 +15,7 @@ public class Main {
 		Class.forName(driver).newInstance();
 		Connection conn = DriverManager.getConnection(url + dbName, userName, password);
 		JDapper jd = new JDapper(conn);
-
+		
 		Stuff s = new Stuff();
 		s.string1 = "Hi youtube";
 		s.number1 = 42;

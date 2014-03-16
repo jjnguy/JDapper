@@ -29,17 +29,11 @@ public class JDapper {
 		}
 		
 		ResultSet rs = statement.executeQuery();
+		ResultSetDeserializer<T> deserial = new ResultSetDeserializer<>(rs, type);
 		
-		while(rs.next()){
-			T obj = type.getConstructor().newInstance();
-			
-			for (Field field : fields) {
-				Object data = rs.getObject(field.getName());
-				field.set(obj, data);
-			}
-			
-			results.add(obj);
-		}
+		for (T item : deserial) {
+         results.add(item);
+      }
 		
 		return results;
 	}
