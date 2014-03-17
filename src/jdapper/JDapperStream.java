@@ -44,7 +44,7 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Spliterator<T> spliterator() {
-      throw new RuntimeException("This doe snot support multithreading");
+      throw new RuntimeException("This does not support multithreading");
    }
 
    @Override
