@@ -24,10 +24,10 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-import javax.management.RuntimeErrorException;
-
-import jdapper.stream.ComposedStream;
+import jdapper.stream.ClosingStream;
+import jdapper.stream.FilteredStream;
 import jdapper.stream.MappedStream;
+import jdapper.stream.PeekingStream;
 
 public class JDapperStream<T> implements Stream<T> {
 
@@ -69,7 +69,7 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> onClose(Runnable closeHandler) {
-      return new ComposedStream<T>(this, closeHandler);
+      return new ClosingStream<T>(this, closeHandler);
    }
 
    @Override
@@ -79,7 +79,7 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> filter(Predicate<? super T> predicate) {
-      return new ComposedStream<T>(this, predicate);
+      return new FilteredStream<T>(this, predicate);
    }
 
    @Override
@@ -133,7 +133,7 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> distinct() {
-      return new ComposedStream<>(this, item -> {
+      return new FilteredStream<>(this, item -> {
          if(returnedObjects.contains(item)) return false;
          returnedObjects.add(item);
          return true;
@@ -154,7 +154,7 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> peek(Consumer<? super T> action) {
-      return new ComposedStream<T>(this, action);
+      return new PeekingStream<T>(this, action);
    }
 
    @Override
