@@ -45,19 +45,17 @@ public class ResultSetDeserializer<T> implements Iterable<T> {
       return new Iterator<T>() {
 
          private T next;
-         private boolean nextWasCalled;
 
          @Override
          public boolean hasNext() {
-            if (!nextWasCalled)
-               return next != null;
-            nextWasCalled = false;
-            return (next = deserializeCurrentRow()) != null;
+            if (next != null)
+               return true;
+            next = deserializeCurrentRow();
+            return next != null;
          }
 
          @Override
          public T next() {
-            nextWasCalled = true;
             if (hasNext())
                return next;
             return null;

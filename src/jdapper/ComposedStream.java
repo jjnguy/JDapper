@@ -2,7 +2,6 @@ package jdapper;
 
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.function.BiConsumer;
@@ -22,37 +21,20 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
-public class CombinedStream<T> implements Stream<T> {
+public abstract class ComposedStream<T> implements Stream<T> {
 
-   private List<Stream<T>> streams;
-   
-   public CombinedStream(List<Stream<T>> streams){
-      this.streams = streams;
+   protected Stream<T> base;
+
+   public ComposedStream(Stream<T> base) {
+      this.base = base;
    }
-   
+
    @Override
    public Iterator<T> iterator() {
-      return new Iterator<T>() {
-         
-         private int currentIteratorNumber = 0;
-         private Iterator<T> currentIterator = streams.get(currentIteratorNumber).iterator();
-         
-         @Override
-         public boolean hasNext() {
-            if (currentIterator.hasNext()) return true;
-            if (currentIteratorNumber >= streams.size()) return false;
-            currentIteratorNumber++;
-            currentIterator = streams.get(currentIteratorNumber).iterator();
-            return currentIterator.hasNext();
-         }
-
-         @Override
-         public T next() {
-            if (!hasNext()) return null;
-            return currentIterator.next();
-         }
-      };
+      return applyOptions().iterator();
    }
+   
+   protected abstract Stream<T> applyOptions();
 
    @Override
    public Spliterator<T> spliterator() {
@@ -86,32 +68,27 @@ public class CombinedStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> onClose(Runnable closeHandler) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().onClose(closeHandler);
    }
 
    @Override
    public void close() {
-      // TODO Auto-generated method stub
-      
+      applyOptions().close();
    }
 
    @Override
    public Stream<T> filter(Predicate<? super T> predicate) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().filter(predicate);
    }
 
    @Override
    public <R> Stream<R> map(Function<? super T, ? extends R> mapper) {
-      // TODO Auto-generated method stub
-      return null;
+      return new MappedStream<>(this, mapper);
    }
 
    @Override
    public IntStream mapToInt(ToIntFunction<? super T> mapper) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().mapToInt(mapper);
    }
 
    @Override
@@ -128,8 +105,7 @@ public class CombinedStream<T> implements Stream<T> {
 
    @Override
    public <R> Stream<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().flatMap(mapper);
    }
 
    @Override
@@ -152,140 +128,116 @@ public class CombinedStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> distinct() {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().distinct();
    }
 
    @Override
    public Stream<T> sorted() {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().sorted();
    }
 
    @Override
    public Stream<T> sorted(Comparator<? super T> comparator) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().sorted(comparator);
    }
 
    @Override
    public Stream<T> peek(Consumer<? super T> action) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().peek(action);
    }
 
    @Override
    public Stream<T> limit(long maxSize) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().limit(maxSize);
    }
 
    @Override
    public Stream<T> skip(long n) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().skip(n);
    }
 
    @Override
    public void forEach(Consumer<? super T> action) {
-      // TODO Auto-generated method stub
-      
+      applyOptions().forEach(action);
    }
 
    @Override
    public void forEachOrdered(Consumer<? super T> action) {
-      // TODO Auto-generated method stub
-      
+      applyOptions().forEachOrdered(action);
    }
 
    @Override
    public Object[] toArray() {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().toArray();
    }
 
    @Override
    public <A> A[] toArray(IntFunction<A[]> generator) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().toArray(generator);
    }
 
    @Override
    public T reduce(T identity, BinaryOperator<T> accumulator) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().reduce(identity, accumulator);
    }
 
    @Override
    public Optional<T> reduce(BinaryOperator<T> accumulator) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().reduce(accumulator);
    }
 
    @Override
    public <U> U reduce(U identity, BiFunction<U, ? super T, U> accumulator, BinaryOperator<U> combiner) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().reduce(identity, accumulator, combiner);
    }
 
    @Override
    public <R> R collect(Supplier<R> supplier, BiConsumer<R, ? super T> accumulator, BiConsumer<R, R> combiner) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().collect(supplier, accumulator, combiner);
    }
 
    @Override
    public <R, A> R collect(Collector<? super T, A, R> collector) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().collect(collector);
    }
 
    @Override
    public Optional<T> min(Comparator<? super T> comparator) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().min(comparator);
    }
 
    @Override
    public Optional<T> max(Comparator<? super T> comparator) {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().max(comparator);
    }
 
    @Override
    public long count() {
-      // TODO Auto-generated method stub
-      return 0;
+      return applyOptions().count();
    }
 
    @Override
    public boolean anyMatch(Predicate<? super T> predicate) {
-      // TODO Auto-generated method stub
-      return false;
+      return applyOptions().anyMatch(predicate);
    }
 
    @Override
    public boolean allMatch(Predicate<? super T> predicate) {
-      // TODO Auto-generated method stub
-      return false;
+      return applyOptions().allMatch(predicate);
    }
 
    @Override
    public boolean noneMatch(Predicate<? super T> predicate) {
-      // TODO Auto-generated method stub
-      return false;
+      return applyOptions().noneMatch(predicate);
    }
 
    @Override
    public Optional<T> findFirst() {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().findFirst();
    }
 
    @Override
    public Optional<T> findAny() {
-      // TODO Auto-generated method stub
-      return null;
+      return applyOptions().findAny();
    }
-
 }

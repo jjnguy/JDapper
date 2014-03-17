@@ -2,6 +2,7 @@ package jdapper;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -27,21 +28,12 @@ import javax.management.RuntimeErrorException;
 
 public class JDapperStream<T> implements Stream<T> {
 
-   private List<Runnable> closers;
-   private List<Predicate<? super T>> filters;
-   
    private final ResultSetDeserializer<T> data;
-   
-   public JDapperStream(ResultSetDeserializer<T> data) {
-      this(data, new ArrayList<>(), new ArrayList<>());
-   }
-   
-   protected JDapperStream(ResultSetDeserializer<T> data, List<Runnable> closers, List<Predicate<? super T>> filters){
-      this.closers = closers;
-      this.filters = filters;
+
+   protected JDapperStream(ResultSetDeserializer<T> data) {
       this.data = data;
    }
-   
+
    @Override
    public Iterator<T> iterator() {
       return data.iterator();
@@ -74,20 +66,17 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> onClose(Runnable closeHandler) {
-      return new JDapperStream<T>(data, copyAndAdd(closers, closeHandler), filters);
+      return new ComposedStream<T>(this, closeHandler);
    }
 
    @Override
    public void close() {
       data.close();
-      for (Runnable r : closers) {
-         r.run();
-      }
    }
 
    @Override
    public Stream<T> filter(Predicate<? super T> predicate) {
-      return new JDapperStream<T>(data, closers, copyAndAdd(filters, predicate));
+      return new ComposedStream<T>(this, predicate);
    }
 
    @Override
@@ -137,10 +126,15 @@ public class JDapperStream<T> implements Stream<T> {
       return null;
    }
 
+   private final HashSet<T> returnedObjects = new HashSet<>();
+
    @Override
    public Stream<T> distinct() {
-      // TODO Auto-generated method stub
-      return null;
+      return new ComposedStream<>(this, item -> {
+         if(returnedObjects.contains(item)) return false;
+         returnedObjects.add(item);
+         return true;
+      });
    }
 
    @Override
@@ -157,8 +151,7 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Stream<T> peek(Consumer<? super T> action) {
-      // TODO Auto-generated method stub
-      return null;
+      return new ComposedStream<T>(this, action);
    }
 
    @Override
@@ -176,13 +169,13 @@ public class JDapperStream<T> implements Stream<T> {
    @Override
    public void forEach(Consumer<? super T> action) {
       // TODO Auto-generated method stub
-      
+
    }
 
    @Override
    public void forEachOrdered(Consumer<? super T> action) {
       // TODO Auto-generated method stub
-      
+
    }
 
    @Override
@@ -274,8 +267,8 @@ public class JDapperStream<T> implements Stream<T> {
       // TODO Auto-generated method stub
       return null;
    }
-   
-   private static <ListType> List<ListType> copyAndAdd(List<ListType> list, ListType newItem){
+
+   private static <ListType> List<ListType> copyAndAdd(List<ListType> list, ListType newItem) {
       List<ListType> newList = new ArrayList<ListType>();
       newList.addAll(list);
       newList.add(newItem);
