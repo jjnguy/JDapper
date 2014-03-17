@@ -1,4 +1,4 @@
-package jdapper;
+package jdapper.stream;
 
 import java.util.Comparator;
 import java.util.Iterator;

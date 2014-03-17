@@ -26,6 +26,9 @@ import java.util.stream.Stream;
 
 import javax.management.RuntimeErrorException;
 
+import jdapper.stream.ComposedStream;
+import jdapper.stream.MappedStream;
+
 public class JDapperStream<T> implements Stream<T> {
 
    private final ResultSetDeserializer<T> data;
