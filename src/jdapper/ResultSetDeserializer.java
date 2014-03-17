@@ -2,6 +2,7 @@ package jdapper;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Iterator;
 
 public class ResultSetDeserializer<T> implements Iterable<T> {
@@ -64,4 +65,12 @@ public class ResultSetDeserializer<T> implements Iterable<T> {
       };
    }
 
+   public void close(){
+      try {
+         data.close();
+      } catch (Exception e) {
+         throw new JDapperException(e);
+      }
+   }
+   
 }
