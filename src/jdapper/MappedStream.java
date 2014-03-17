@@ -24,21 +24,21 @@ import java.util.stream.Stream;
 public class MappedStream<From, To> implements Stream<To> {
 
    private Stream<From> base;
-   private Function<From, To> mapper;
+   private Function<? super From, ? extends To> mapper;
    
-   public MappedStream(Stream<From> base, Function<From, To> mapper){
+   public MappedStream(Stream<From> base, Function<? super From, ? extends To> mapper){
       this.base = base;
       this.mapper = mapper;
    }
 
    @Override
    public Iterator<To> iterator() {
-      return base.map(mapper).iterator();
+      return (Iterator<To>) base.map(mapper).iterator();
    }
 
    @Override
    public Spliterator<To> spliterator() {
-      return base.map(mapper).spliterator();
+      return (Spliterator<To>) base.map(mapper).spliterator();
    }
 
    @Override
@@ -53,17 +53,17 @@ public class MappedStream<From, To> implements Stream<To> {
 
    @Override
    public Stream<To> parallel() {
-      return base.map(mapper).parallel();
+      return (Stream<To>) base.map(mapper).parallel();
    }
 
    @Override
    public Stream<To> unordered() {
-      return base.map(mapper).unordered();
+      return (Stream<To>) base.map(mapper).unordered();
    }
 
    @Override
    public Stream<To> onClose(Runnable closeHandler) {
-      return base.map(mapper).onClose(closeHandler);
+      return (Stream<To>) base.map(mapper).onClose(closeHandler);
    }
 
    @Override
@@ -73,7 +73,7 @@ public class MappedStream<From, To> implements Stream<To> {
 
    @Override
    public Stream<To> filter(Predicate<? super To> predicate) {
-      return base.map(mapper).filter(predicate);
+      return (Stream<To>) base.map(mapper).filter(predicate);
    }
 
    @Override
@@ -118,32 +118,32 @@ public class MappedStream<From, To> implements Stream<To> {
 
    @Override
    public Stream<To> distinct() {
-      return base.map(this.mapper).distinct();
+      return (Stream<To>) base.map(this.mapper).distinct();
    }
 
    @Override
    public Stream<To> sorted() {
-      return base.map(this.mapper).sorted();
+      return (Stream<To>) base.map(this.mapper).sorted();
    }
 
    @Override
    public Stream<To> sorted(Comparator<? super To> comparator) {
-      return base.map(this.mapper).sorted(comparator);
+      return (Stream<To>) base.map(this.mapper).sorted(comparator);
    }
 
    @Override
    public Stream<To> peek(Consumer<? super To> action) {
-      return base.map(this.mapper).peek(action);
+      return (Stream<To>) base.map(this.mapper).peek(action);
    }
 
    @Override
    public Stream<To> limit(long maxSize) {
-      return base.map(this.mapper).limit(maxSize);
+      return (Stream<To>) base.map(this.mapper).limit(maxSize);
    }
 
    @Override
    public Stream<To> skip(long n) {
-      return base.map(this.mapper).skip(n);
+      return (Stream<To>) base.map(this.mapper).skip(n);
    }
 
    @Override
@@ -168,12 +168,12 @@ public class MappedStream<From, To> implements Stream<To> {
 
    @Override
    public To reduce(To identity, BinaryOperator<To> accumulator) {
-      return base.map(this.mapper).reduce(identity, accumulator);
+      return base.map(item->(To)mapper.apply(item)).reduce(identity, accumulator);
    }
 
    @Override
    public Optional<To> reduce(BinaryOperator<To> accumulator) {
-      return base.map(this.mapper).reduce(accumulator);
+      return base.map(item->(To)mapper.apply(item)).reduce(accumulator);
    }
 
    @Override
@@ -193,12 +193,12 @@ public class MappedStream<From, To> implements Stream<To> {
 
    @Override
    public Optional<To> min(Comparator<? super To> comparator) {
-      return base.map(this.mapper).min(comparator);
+      return (Optional<To>) base.map(this.mapper).min(comparator);
    }
 
    @Override
    public Optional<To> max(Comparator<? super To> comparator) {
-      return base.map(this.mapper).max(comparator);
+      return (Optional<To>) base.map(this.mapper).max(comparator);
    }
 
    @Override
@@ -223,11 +223,11 @@ public class MappedStream<From, To> implements Stream<To> {
 
    @Override
    public Optional<To> findFirst() {
-      return base.map(this.mapper).findFirst();
+      return (Optional<To>) base.map(this.mapper).findFirst();
    }
 
    @Override
    public Optional<To> findAny() {
-      return base.map(this.mapper).findAny();
+      return (Optional<To>) base.map(this.mapper).findAny();
    }
 }

@@ -23,14 +23,23 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import javax.management.RuntimeErrorException;
+
 public class JDapperStream<T> implements Stream<T> {
 
    private List<Runnable> closers;
+   private List<Predicate<? super T>> filters;
+   
    private final ResultSetDeserializer<T> data;
    
    public JDapperStream(ResultSetDeserializer<T> data) {
+      this(data, new ArrayList<>(), new ArrayList<>());
+   }
+   
+   protected JDapperStream(ResultSetDeserializer<T> data, List<Runnable> closers, List<Predicate<? super T>> filters){
+      this.closers = closers;
+      this.filters = filters;
       this.data = data;
-      closers = new ArrayList<Runnable>();
    }
    
    @Override
@@ -40,56 +49,50 @@ public class JDapperStream<T> implements Stream<T> {
 
    @Override
    public Spliterator<T> spliterator() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("This doe snot support multithreading");
    }
 
    @Override
    public boolean isParallel() {
-      // TODO Auto-generated method stub
       return false;
    }
 
    @Override
    public Stream<T> sequential() {
-      // TODO Auto-generated method stub
-      return null;
+      return this;
    }
 
    @Override
    public Stream<T> parallel() {
-      // TODO Auto-generated method stub
-      return null;
+      throw new RuntimeException("This doe snot support multithreading");
    }
 
    @Override
    public Stream<T> unordered() {
-      // TODO Auto-generated method stub
-      return null;
+      return this;
    }
 
    @Override
    public Stream<T> onClose(Runnable closeHandler) {
-      // TODO Auto-generated method stub
-      return null;
+      return new JDapperStream<T>(data, copyAndAdd(closers, closeHandler), filters);
    }
 
    @Override
    public void close() {
-      // TODO Auto-generated method stub
-      
+      data.close();
+      for (Runnable r : closers) {
+         r.run();
+      }
    }
 
    @Override
    public Stream<T> filter(Predicate<? super T> predicate) {
-      // TODO Auto-generated method stub
-      return null;
+      return new JDapperStream<T>(data, closers, copyAndAdd(filters, predicate));
    }
 
    @Override
    public <R> Stream<R> map(Function<? super T, ? extends R> mapper) {
-      // TODO Auto-generated method stub
-      return null;
+      return new MappedStream<T, R>(this, mapper);
    }
 
    @Override
@@ -270,5 +273,12 @@ public class JDapperStream<T> implements Stream<T> {
    public Optional<T> findAny() {
       // TODO Auto-generated method stub
       return null;
+   }
+   
+   private static <ListType> List<ListType> copyAndAdd(List<ListType> list, ListType newItem){
+      List<ListType> newList = new ArrayList<ListType>();
+      newList.addAll(list);
+      newList.add(newItem);
+      return newList;
    }
 }
