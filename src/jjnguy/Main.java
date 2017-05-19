@@ -1,9 +1,9 @@
+package jjnguy;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.util.List;
-import java.util.Scanner;
 
-import jdapper.JDapper;
+import jjnguy.jdapper.JDapper;
 
 public class Main {
 	public static void main(String[] args) throws Exception {

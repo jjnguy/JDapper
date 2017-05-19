@@ -1,3 +1,4 @@
+package jjnguy;
 
 public class Country {
 	private String code;

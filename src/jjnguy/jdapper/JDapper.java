@@ -1,4 +1,4 @@
-package jdapper;
+package jjnguy.jdapper;
 
 import java.lang.reflect.Field;
 import java.sql.Connection;
