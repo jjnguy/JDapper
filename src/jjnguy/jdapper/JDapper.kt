@@ -8,11 +8,7 @@ class JDapper(private val conn: Connection) {
   fun <T> query(sql: String, type: Class<T>, vararg params: Any): List<T> {
     val results = ArrayList<T>()
 
-    val fields = type.declaredFields.apply {
-      forEach { field ->
-        field.isAccessible = true
-      }
-    }
+    val fields = type.declaredFields.makeAccessible()
 
     val statement = conn.prepareStatement(sql).apply {
       for (i in params.indices) {

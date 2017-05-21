@@ -1,11 +1,16 @@
 package jjnguy.jdapper
 
-fun higherOrder1(function: Int.() -> String) {
-  val str: String = function(6)
+import java.lang.reflect.Field
+
+
+fun Array<Field>.makeAccessible(): Array<Field> {
+  forEach { field ->
+    field.isAccessible = true
+  }
+
+  return this
 }
 
-fun run() {
-
-  higherOrder1({ toString() })
-
+fun String.upper(numberToUpper: Int): String {
+  return this.substring(0, numberToUpper).toUpperCase() + this.substring(numberToUpper)
 }
