@@ -8,7 +8,6 @@ import java.util.ArrayList
 
 class JDapper(private val conn: Connection) {
 
-  @Throws(Exception::class)
   fun <T> query(sql: String, type: Class<T>, vararg params: Any): List<T> {
     val results = ArrayList<T>()
 
@@ -38,7 +37,6 @@ class JDapper(private val conn: Connection) {
     return results
   }
 
-  @Throws(Exception::class)
   fun insert(tableName: String, data: Any) {
     val type = data.javaClass
     val fields = type.fields
